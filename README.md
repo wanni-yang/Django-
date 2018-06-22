@@ -20,11 +20,38 @@ def run(addr, port, wsgi_handler, ipv6=False, threading=False, server_cls=WSGISe
  </code></pre>
  
 runserver命令具体做了哪些操作：
- - 解析参数，获取WSGIHandler
+ - 根据ip_address和port生成一个WSGIServer对象，接受用户请求
  <pre>
  通过django.core.servers.basehttp.get_internal_wsgi_application获取wsgi_handler,
  这里的get_internal_wsgi_application获取了settings.py中的WSGI_APPLICATION的值app.wsgi.application。
  这里settings.py、wsgi.py也是django创建项目时生成，app为创建的项目名称。
  在app.wsgi模块下获取application的值get_wsgi_handler(),返回WSGIHandler
  </pre>
- - 根据ip_address和port生成一个WSGIServer对象，接受用户请求
+ - 解析参数，获取WSGIHandler
+ <pre>
+ class WSGIHandler(base.BaseHandler):
+    def __call__(self, environ, start_response):
+	    pass
+
+ </pre>
+ WSGIHandler继承BaseHandler,主要做的事情导入项目中的 settings模块、导入 自定义例外类，最后调用自己的 load_middleware 方法（只有第一次请求时会调用 ），加载所有列在 MIDDLEWARE_CLASSES 中的 middleware 类并且内省它们
+##### WSGI规范
+<pre>
+它规定应用是可调用对象(函数/方法)，然后它接受2个固定参数：一个是含有服务器端的环境变量，另一个是可调用对象，这个对象用来初始化响应，给响应加上status code状态码和httpt头部，并且返回一个可调用对象。
+def simplr_wsgi_app(environ, start_response):
+	# 固定两个参数，django中也使用同样的变量名
+	status = '200 OK'
+	headers = [{'Content-type': 'text/plain'}]
+	# 初始化响应, 必须在返回前调用
+	start_response(status, headers)
+	# 返回可迭代对象
+	return ['hello world!']
+</pre>
+
+##### 中间件
+一 个 middleware 类可以包括请求响应过程的四个阶段：request，view，response 和 exception。对应的方法：process_request，process_view， process_response 和 process_exception。我们在middleware中间件中定义其中的方法。Middleware是在Django BaseHandler的load_middleware方法执行时加载的，加载之后会建立四个列表作为处理器的实例变量：
+
+  -  _request_middleware：process_request方法的列表
+  -  _view_middleware：process_view方法的列表
+  -  _response_middleware：process_response方法的列表
+  -  b_exception_middleware：process_exception方法的列表
