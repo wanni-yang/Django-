@@ -57,5 +57,6 @@ def simplr_wsgi_app(environ, start_response):
   -  _response_middleware：process_response方法的列表
   -  b_exception_middleware：process_exception方法的列表
 ##### django处理请求的过程
-<img src='django-request.png'/>
-<img src='djangp request.png'/>
+<p><img src='django-request.png' style = 'text-align:center'/></p>
+
+<p><img src='django request.png' style = 'text-align:center'/></p>
