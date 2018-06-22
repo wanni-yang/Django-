@@ -37,7 +37,8 @@ runserver命令具体做了哪些操作：
  WSGIHandler继承BaseHandler,主要做的事情导入项目中的 settings模块、导入 自定义例外类，最后调用自己的 load_middleware 方法（只有第一次请求时会调用 ），加载所有列在 MIDDLEWARE_CLASSES 中的 middleware 类并且内省它们
 ##### WSGI规范
 <pre>
-它规定应用是可调用对象(函数/方法)，然后它接受2个固定参数：一个是含有服务器端的环境变量，另一个是可调用对象，这个对象用来初始化响应，给响应加上status code状态码和httpt头部，并且返回一个可调用对象。
+它规定应用是可调用对象(函数/方法)，然后它接受2个固定参数：一个是含有服务器端的环境变量，另一个是可调用对象，这个对象用来初始化响应，
+给响应加上status code状态码和httpt头部，并且返回一个可调用对象。
 def simplr_wsgi_app(environ, start_response):
 	# 固定两个参数，django中也使用同样的变量名
 	status = '200 OK'
